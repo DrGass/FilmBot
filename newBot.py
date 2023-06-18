@@ -18,6 +18,7 @@ myIntents = discord.Intents.default()
 myIntents.messages=True
 myIntents.message_content=True
 myIntents.reactions=True
+myIntents.guilds=True
 
 bot = commands.Bot(command_prefix="!", intents=myIntents, help_command=None)
 
