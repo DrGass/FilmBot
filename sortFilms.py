@@ -1,8 +1,11 @@
 import os
+from database import save, load
+import psycopg2
+from dbconfig import config
+from psycopg2.extras import Json
 
-
+# Think of a way to imporove that because it's kinda wacky :>
 def main():
-    filmList = os.listdir("D:\Pobrane\Filmy")
 
     numberDict = {
         "1": ":one:",
@@ -15,29 +18,21 @@ def main():
         "8": ":eight:",
         "9": ":nine:",
     }
+
     filmCount = 1
     filmDict = {}
+    load(id,['films'])
     filmMessage = ""
 
-    for film in filmList:
-        filmName = convertName(film)
-
-        filmDict[filmName] = str(filmCount)
+    for film,watched in filmDict.items:
+        if watched == 1:
+            continue
         filmMessage = (
-            filmMessage + numberDict.get(str(filmCount)) + " " + filmName + "\n"
+            filmMessage + numberDict.get(str(filmCount)) + " " + film + "\n"
         )
         filmCount += 1
-
+    print (filmDict,filmMessage)
     return filmDict, filmMessage
-
-
-def convertName(filmName):
-    filmFormat = ""
-    for word in filmName.split("."):
-        if word.isnumeric():
-            filmFormat += word
-            return filmFormat
-        filmFormat += word + " "
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import json
 import time
 import sys
 import asyncio
+from database import save, load
 
 sys.path.insert(0, "..\\Script")
 
@@ -12,15 +13,15 @@ from sortFilms import main as sort
 
 class UpdateFilmListCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
+
         self.bot = bot
         self.dataDict = {}
         self.filmDict, self.filmList = sort()
         self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
-        self.acceptedChannels = [1097826304797188177, 468600962538405888]
-        self.filmPropositions = []
-        self.filmsPath = ".\data\\films.json"
-        self.dataPath = ".\data\data.json"
-        self.messagesToDel = ["taki", "głosowanie", "usunięto", "dodano"]
+        self.acceptedChannels = []
+        self.filmPropositions = {}
+        self.messagesToDel = ["taki", "głosowanie", "usunięto", "dodano","trwa"]
+        self.pingRole = 0
 
     def saveFilms(self):
         with open(self.filmsPath, "w") as fp:
@@ -29,14 +30,6 @@ class UpdateFilmListCog(commands.Cog):
     def loadFilms(self):
         with open(self.filmsPath, "rb") as fp:
             self.filmPropositions = json.load(fp)
-
-    def loadData(self):
-        with open(self.dataPath, "r") as openFile:
-            self.dataDict = json.load(openFile)
-
-    def saveData(self):
-        with open(self.dataPath, "w") as saveFile:
-            json.dump(self.dataDict, saveFile)
 
     # Starting bot, loading data
     @commands.Cog.listener()
@@ -53,8 +46,9 @@ class UpdateFilmListCog(commands.Cog):
             return
 
         if self.dataDict["lastVoting"] == "0":
+            pingMsg = f'<@&{self.pingRole}>' if self.pingRole is not None else 'Moi drodzy,'
             await ctx.channel.send(
-                f"<@&1097826568065265675> Zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
+                f"{pingMsg} zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
             )
             self.dataDict["lastVoting"] = "1"
             self.saveData()
@@ -72,16 +66,17 @@ class UpdateFilmListCog(commands.Cog):
                     await ctx.message.delete()
                     return
 
-            self.dataDict["lastVoting"] = "0"
-            self.saveData()
-            await ctx.channel.send(
-                f"<@&1097826568065265675> Zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
-            )
+            # Why is this here second time?
+            # self.dataDict["lastVoting"] = "0"
+            # self.saveData()
+            # await ctx.channel.send(
+            #     f"<@&1097826568065265675> zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
+            # )
 
         await ctx.message.delete()
 
     @commands.command()
-    async def proposeadd(self, ctx: commands.Context):
+    async def padd(self, ctx: commands.Context):
         filmToAdd = str(ctx.message.content[11:])
         finalString = ""
         num = 1
@@ -110,7 +105,7 @@ class UpdateFilmListCog(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def propose(self, ctx: commands.Context):
+    async def p(self, ctx: commands.Context):
         finalString = ""
         num = 1
         for film in self.filmPropositions:
@@ -122,7 +117,7 @@ class UpdateFilmListCog(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def proposedel(self, ctx: commands.Context):
+    async def pdel(self, ctx: commands.Context):
         # take firt word in film name and convert it to str
         filmToDel = str((ctx.message.content[11:].split())[0])
 
@@ -136,6 +131,11 @@ class UpdateFilmListCog(commands.Cog):
                 break
 
         await ctx.message.delete()
+
+    @commands.command()
+    async def setchannel(self, ctx:commands.Context):
+        # Add question and set channel
+        await ctx.send("pp")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
