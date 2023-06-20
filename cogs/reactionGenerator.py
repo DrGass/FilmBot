@@ -13,7 +13,7 @@ class ReactionGeneratorCog(commands.Cog):
         self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
         self.filmDict, self.filmList = sort()
         self.dataDict = {}
-        self.acceptedChannels = [1097826304797188177,468600962538405888]
+        self.acceptedChannels = [1097826304797188177, 468600962538405888]
 
     def loadData(self):
         with open(".\data\data.json", "r") as openFile:
@@ -23,15 +23,17 @@ class ReactionGeneratorCog(commands.Cog):
         with open(".\data\data.json", "w") as saveFile:
             json.dump(self.dataDict, saveFile)
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.loadData()
+    
+    # It probably needs to be rewritten 
 
     @commands.Cog.listener()
     async def on_reaction_add(
         self, reaction: discord.Reaction, user: discord.Member | discord.User
     ):
-        if user == self.bot.user or reaction.message.channel.id not in self.acceptedChannels:
+        if (
+            user == self.bot.user
+            or reaction.message.channel.id not in self.acceptedChannels
+        ):
             return
 
         self.loadData()
@@ -40,8 +42,7 @@ class ReactionGeneratorCog(commands.Cog):
             str(reaction.message.id) == self.dataDict["lastVotingMessage"]
             and reaction.count >= 2
         ):
-
-            self.dataDict['winner'] = str(reaction)
+            self.dataDict["winner"] = str(reaction)
             self.dataDict["lastVoting"] = "0"
             self.saveData()
 
@@ -51,14 +52,14 @@ class ReactionGeneratorCog(commands.Cog):
             winning_number = str(self.emojis.index(str(reaction)) + 1)
             winner = swapped_dict[winning_number]
 
-            votingTime = str(discord.utils.snowflake_time(int(self.dataDict["lastVotingMessage"])))
-            votingTime = votingTime[:(votingTime.find(":") - 2)]
-
+            votingTime = str(
+                discord.utils.snowflake_time(int(self.dataDict["lastVotingMessage"]))
+            )
+            votingTime = votingTime[: (votingTime.find(":") - 2)]
 
             await reaction.message.channel.send(
-                f'Drodzy <@&1097826568065265675>! W głosowaniu z {str(votingTime)} wygrał film numer {winning_number} : {winner}'
+                f"Drodzy <@&1097826568065265675>! W głosowaniu z {str(votingTime)} wygrał film numer {winning_number} : {winner}"
             )
-            
 
 
 async def setup(bot: commands.Bot):

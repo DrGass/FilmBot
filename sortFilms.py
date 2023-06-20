@@ -4,9 +4,9 @@ import psycopg2
 from dbconfig import config
 from psycopg2.extras import Json
 
-# Think of a way to imporove that because it's kinda wacky :>
-def main():
 
+# Check if this cannot be written better because it looks cursed XD
+def main():
     numberDict = {
         "1": ":one:",
         "2": ":two:",
@@ -21,17 +21,15 @@ def main():
 
     filmCount = 1
     filmDict = {}
-    load(id,['films'])
+    load(id, ["films"])
     filmMessage = ""
 
-    for film,watched in filmDict.items:
+    for film, watched in filmDict.items:
         if watched == 1:
             continue
-        filmMessage = (
-            filmMessage + numberDict.get(str(filmCount)) + " " + film + "\n"
-        )
+        filmMessage = filmMessage + numberDict.get(str(filmCount)) + " " + film + "\n"
         filmCount += 1
-    print (filmDict,filmMessage)
+    print(filmDict, filmMessage)
     return filmDict, filmMessage
 
 

@@ -8,7 +8,9 @@ class JoinReactionCog(commands.Cog):
         self.bot = bot
 
 
-    # po dołączeniu do serwera utworzyć nową pozycję w bazie danych, pod warunkiem, że nie istnieje (w wypadku ponownego dołączenia do serwera)
+    # After joining the server, create a new entry in the database, provided that it does not exist (in case of rejoining the server).
+    # Add setting channel and asking if user wants to choose it himself, also, take role. Make automatic creation of role and channel if user wants(preferably in another file)
+
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         """ Save all the data to database """

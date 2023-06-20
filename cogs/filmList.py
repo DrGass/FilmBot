@@ -13,29 +13,17 @@ from sortFilms import main as sort
 
 class UpdateFilmListCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
-
         self.bot = bot
         self.dataDict = {}
         self.filmDict, self.filmList = sort()
         self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
         self.acceptedChannels = []
-        self.filmPropositions = {}
-        self.messagesToDel = ["taki", "głosowanie", "usunięto", "dodano","trwa"]
+        self.messagesToDel = ["taki", "głosowanie", "usunięto", "dodano", "trwa"]
         self.pingRole = 0
 
-    def saveFilms(self):
-        with open(self.filmsPath, "w") as fp:
-            json.dump(self.filmPropositions, fp)
-
-    def loadFilms(self):
-        with open(self.filmsPath, "rb") as fp:
-            self.filmPropositions = json.load(fp)
-
-    # Starting bot, loading data
+    # What bot does at startup
     @commands.Cog.listener()
     async def on_ready(self):
-        self.loadData()
-        self.loadFilms()
         print(
             f"We have logged in as {self.bot.user} and loaded Dict: \n {self.dataDict} \n and propositions : \n {self.filmPropositions}"
         )
@@ -46,7 +34,9 @@ class UpdateFilmListCog(commands.Cog):
             return
 
         if self.dataDict["lastVoting"] == "0":
-            pingMsg = f'<@&{self.pingRole}>' if self.pingRole is not None else 'Moi drodzy,'
+            pingMsg = (
+                f"<@&{self.pingRole}>" if self.pingRole is not None else "Moi drodzy,"
+            )
             await ctx.channel.send(
                 f"{pingMsg} zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
             )
@@ -66,96 +56,90 @@ class UpdateFilmListCog(commands.Cog):
                     await ctx.message.delete()
                     return
 
-            # Why is this here second time?
-            # self.dataDict["lastVoting"] = "0"
-            # self.saveData()
-            # await ctx.channel.send(
-            #     f"<@&1097826568065265675> zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
-            # )
-
         await ctx.message.delete()
 
-    @commands.command()
-    async def padd(self, ctx: commands.Context):
-        filmToAdd = str(ctx.message.content[11:])
-        finalString = ""
-        num = 1
+    # Rewrite adding, showing and removing propositions and add same solutions to film list (if someone won't be using app, then it'll be more accesible c: )
 
-        for film in self.filmPropositions:
-            finalString += str(num) + ": " + film + "\n"
-            num += 1
+    # Moved to propositionList.py
 
-        # If no arguments were given
-        if len(filmToAdd) == 0:
-            await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
-        else:
-            for film in self.filmPropositions:
-                if filmToAdd.lower() in str(film).lower():
-                    await ctx.channel.send(f"Taki film już jest na liście")
-                    return
+    # @commands.command()
+    # async def padd(self, ctx: commands.Context):
+    #     filmToAdd = str(ctx.message.content[11:])
+    #     finalString = ""
+    #     num = 1
 
-            self.filmPropositions.append(filmToAdd)
-            finalString += str(num) + ": " + filmToAdd + "\n"
+    #     for film in self.filmPropositions:
+    #         finalString += str(num) + ": " + film + "\n"
+    #         num += 1
 
-            await ctx.channel.send(
-                f"<@{ctx.message.author.id}>, dodano propozycję: {filmToAdd}, lista teraz prezentuje się tak: \n{finalString}"
-            )
-            self.saveFilms()
+    #     # If no arguments were given
+    #     if len(filmToAdd) == 0:
+    #         await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
+    #     else:
+    #         for film in self.filmPropositions:
+    #             if filmToAdd.lower() in str(film).lower():
+    #                 await ctx.channel.send(f"Taki film już jest na liście")
+    #                 return
 
-        await ctx.message.delete()
+    #         self.filmPropositions.append(filmToAdd)
+    #         finalString += str(num) + ": " + filmToAdd + "\n"
 
-    @commands.command()
-    async def p(self, ctx: commands.Context):
-        finalString = ""
-        num = 1
-        for film in self.filmPropositions:
-            finalString += str(num) + ": " + film + "\n"
-            num += 1
+    #         await ctx.channel.send(
+    #             f"<@{ctx.message.author.id}>, dodano propozycję: {filmToAdd}, lista teraz prezentuje się tak: \n{finalString}"
+    #         )
+    #         self.saveFilms()
 
-        await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
+    #     await ctx.message.delete()
 
-        await ctx.message.delete()
+    # @commands.command()
+    # async def p(self, ctx: commands.Context):
+    #     finalString = ""
+    #     num = 1
+    #     for film in self.filmPropositions:
+    #         finalString += str(num) + ": " + film + "\n"
+    #         num += 1
 
-    @commands.command()
-    async def pdel(self, ctx: commands.Context):
-        # take firt word in film name and convert it to str
-        filmToDel = str((ctx.message.content[11:].split())[0])
+    #     await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
 
-        for film in self.filmPropositions:
-            if filmToDel.lower() in str(film).lower():
-                self.filmPropositions.remove(film)
-                await ctx.channel.send(
-                    f"<@{ctx.message.author.id}>, usunięto pozycję: {film}"
-                )
-                self.saveFilms()
-                break
+    #     await ctx.message.delete()
 
-        await ctx.message.delete()
+    # @commands.command()
+    # async def pdel(self, ctx: commands.Context):
+    #     # take firt word in film name and convert it to str
+    #     filmToDel = str((ctx.message.content[11:].split())[0])
 
-    @commands.command()
-    async def setchannel(self, ctx:commands.Context):
-        # Add question and set channel
-        await ctx.send("pp")
+    #     for film in self.filmPropositions:
+    #         if filmToDel.lower() in str(film).lower():
+    #             self.filmPropositions.remove(film)
+    #             await ctx.channel.send(
+    #                 f"<@{ctx.message.author.id}>, usunięto pozycję: {film}"
+    #             )
+    #             self.saveFilms()
+    #             break
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        if message.channel.id not in self.acceptedChannels:
-            return
+    #     await ctx.message.delete()
+    
+    # Moved to deleteListener.py
 
-        # print(self.dataDict, message.author, self.bot.user)
-        if message.author == self.bot.user:
-            # Voting message adding reactions
-            if message.content.startswith("<@&"):
-                for i in range(0, len(self.filmDict)):
-                    await message.add_reaction(self.emojis[i])
+    # @commands.Cog.listener()
+    # async def on_message(self, message: discord.Message):
+    #     if message.channel.id not in self.acceptedChannels:
+    #         return
 
-                self.dataDict["lastVotingMessage"] = str(message.id)
-                self.saveData()
+    #     # print(self.dataDict, message.author, self.bot.user)
+    #     if message.author == self.bot.user:
+    #         # Voting message adding reactions
+    #         if message.content.startswith("<@&"):
+    #             for i in range(0, len(self.filmDict)):
+    #                 await message.add_reaction(self.emojis[i])
 
-            # Voting is running message
-            elif self.messagesToDel in message.content.lower():
-                await asyncio.sleep(5)
-                await message.delete()
+    #             self.dataDict["lastVotingMessage"] = str(message.id)
+    #             self.saveData()
+
+    #         # Voting is running message
+    #         elif self.messagesToDel in message.content.lower():
+    #             await asyncio.sleep(5)
+    #             await message.delete()
 
 
 async def setup(bot):
