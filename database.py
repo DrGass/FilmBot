@@ -22,12 +22,15 @@ def load(id, queryList):
 
         # select_query = cur.execute(f'SELECT * FROM guilds WHERE id = {id};')
         cur.execute(f"SELECT {query[:-1]} FROM guilds WHERE id = {id};")
-        data = cur.fetchone()
+        data = cur.fetchall()
 
         print(data, type(data))
 
         # close the communication with the PostgreSQL
         cur.close()
+
+        return data
+
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
     finally:
@@ -36,7 +39,7 @@ def load(id, queryList):
             print("Database connection closed.")
 
 
-def save(id, queryList):
+def save(id, queryDict):
     """Load all the data from database"""
     conn = None
     try:
@@ -48,6 +51,12 @@ def save(id, queryList):
 
         # create a cursor
         cur = conn.cursor()
+
+        for query, value in queryDict.items():
+            try:
+                cur.execute(f"UPDATE guilds SET '{str(query)}' = {value} WHERE id = {id};")
+            except:
+                print('oopsie daisy')
 
         # close the communication with the PostgreSQL
         cur.close()
