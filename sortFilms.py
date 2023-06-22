@@ -6,7 +6,7 @@ from psycopg2.extras import Json
 
 
 # Check if this cannot be written better because it looks cursed XD
-def main():
+def main(id):
     numberDict = {
         "1": ":one:",
         "2": ":two:",
@@ -20,8 +20,7 @@ def main():
     }
 
     filmCount = 1
-    filmDict = {}
-    load(id, ["films"])
+    filmDict = load(id, ["films"])[0]
     filmMessage = ""
 
     for film, watched in filmDict.items:

@@ -14,24 +14,27 @@ from sortFilms import main as sort
 class UpdateFilmListCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.dataDict = {}
-        self.filmDict, self.filmList = sort()
         self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
-        self.acceptedChannels = []
-        self.messagesToDel = ["taki", "głosowanie", "usunięto", "dodano", "trwa"]
-        self.pingRole = 0
+        
 
-    # What bot does at startup
+    # Just informing me login was succsessful 
     @commands.Cog.listener()
     async def on_ready(self):
         print(
             f"We have logged in as {self.bot.user} and loaded Dict: \n {self.dataDict} \n and propositions : \n {self.filmPropositions}"
         )
 
+
+    # W pizdu do przepisania XD
     @commands.command()
     async def film(self, ctx: commands.Context):
-        if ctx.message.channel.id not in self.acceptedChannels:
+        data = load()
+        acceptedChannel = 0
+
+        if ctx.message.channel.id not in acceptedChannel:
             return
+
+        self.filmDict, self.filmList = sort()
 
         if self.dataDict["lastVoting"] == "0":
             pingMsg = (
@@ -60,7 +63,7 @@ class UpdateFilmListCog(commands.Cog):
 
     # Rewrite adding, showing and removing propositions and add same solutions to film list (if someone won't be using app, then it'll be more accesible c: )
 
-    # Moved to propositionList.py
+    ### Moved to propositionList.py
 
     # @commands.command()
     # async def padd(self, ctx: commands.Context):
@@ -119,7 +122,7 @@ class UpdateFilmListCog(commands.Cog):
 
     #     await ctx.message.delete()
     
-    # Moved to deleteListener.py
+    ### Moved to deleteListener.py
 
     # @commands.Cog.listener()
     # async def on_message(self, message: discord.Message):
