@@ -21,36 +21,40 @@ class UpdateFilmListCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(
-            f"We have logged in as {self.bot.user} and loaded Dict: \n {self.dataDict} \n and propositions : \n {self.filmPropositions}"
+            f"We have logged in as {self.bot.user}"
         )
 
 
-    # W pizdu do przepisania XD
+    # Most probably finished, but might need some polishing
     @commands.command()
     async def film(self, ctx: commands.Context):
-        data = load()
-        acceptedChannel = 0
+        data = load(lastVoting,lastVotingMessage,role,channel)
 
-        if ctx.message.channel.id not in acceptedChannel:
+        lastVoting = data[0]
+        lastVotingMessage = data[1]
+        role = data[2]
+        channel = data[3]
+        id = ctx.guild.id 
+
+        if ctx.message.channel.id != channel:
             return
 
-        self.filmDict, self.filmList = sort()
+        filmDict, filmList = sort(id)
 
-        if self.dataDict["lastVoting"] == "0":
+        if lastVoting:
             pingMsg = (
-                f"<@&{self.pingRole}>" if self.pingRole is not None else "Moi drodzy,"
+                f"<@&{role}>" if role is not None else "Moi drodzy,"
             )
             await ctx.channel.send(
-                f"{pingMsg} zapraszam do głosowania, w dzisiejszym menu mamy: \n{self.filmList}"
+                f"{pingMsg} zapraszam do głosowania, w dzisiejszym menu mamy: \n{filmList}"
             )
-            self.dataDict["lastVoting"] = "1"
-            self.saveData()
+            lastVoting = True
+            save({"lastVoting" : lastVoting})
 
         else:
-            print("hi")
-            async for msg in ctx.channel.history(limit=10):
-                print(msg.id, self.dataDict["lastVotingMessage"])
-                if str(msg.id) == self.dataDict["lastVotingMessage"]:
+            async for msg in ctx.channel.history(limit=50):
+                # print(msg.id, self.dataDict["lastVotingMessage"])
+                if str(msg.id) == lastVotingMessage:
                     await msg.reply(
                         f"Głosowanie już trwa -> <@{ctx.message.author.id}> <-"
                     )
