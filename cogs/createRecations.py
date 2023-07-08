@@ -8,7 +8,7 @@ from database import save, load
 sys.path.insert(0, "..\\Script")
 
 
-class ReactionGeneratorCog(commands.Cog):
+class CreateReactionsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
@@ -63,6 +63,30 @@ class ReactionGeneratorCog(commands.Cog):
                 {str(votingTime)} wygrał film numer {winning_number} : {winner}"
         )
 
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+
+        id = message.guild.id
+
+        data = load(id,[lastVotingMessage,acceptedChannel])
+
+        lastVotingMessage = data[0] 
+        acceptedChannel = data[1]
+        
+
+        if message.channel.id != acceptedChannel or message.author != self.bot.user:
+            return
+        
+        film_dict, film_list = sort(id)
+
+        # Voting message adding reactions
+        if message.content.startswith("<@&"):
+            for i in range(0, len(film_dict)):
+                await message.add_reaction(self.emojis[i])
+
+            lastVotingMessage = str(message.id)
+            save({"lastVotingMessage":lastVotingMessage})
+
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(ReactionGeneratorCog(bot))
+    await bot.add_cog(CreateReactionsCog(bot))

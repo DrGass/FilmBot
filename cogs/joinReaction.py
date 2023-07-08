@@ -3,6 +3,8 @@ from discord.ext import commands
 import psycopg2
 from dbconfig import config
 
+    # Most probably finished 
+
 class JoinReactionCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot

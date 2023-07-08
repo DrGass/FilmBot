@@ -3,7 +3,7 @@ from dbconfig import config
 from psycopg2.extras import Json
 
 
-def load(id, queryList):
+def load(id, query_list):
     """Save all the data to database"""
     conn = None
     try:
@@ -17,8 +17,8 @@ def load(id, queryList):
 
         cur = conn.cursor()
         query = ""
-        for item in queryList:
-            query += str(item) + ","
+        for item in query_list:
+            query += (str(item)).replace('_','') + ","
 
         # select_query = cur.execute(f'SELECT * FROM guilds WHERE id = {id};')
         cur.execute(f"SELECT {query[:-1]} FROM guilds WHERE id = {id};")
@@ -39,7 +39,7 @@ def load(id, queryList):
             print("Database connection closed.")
 
 
-def save(id, queryDict):
+def save(id, query_dict):
     """Load all the data from database"""
     conn = None
     try:
@@ -52,7 +52,7 @@ def save(id, queryDict):
         # create a cursor
         cur = conn.cursor()
 
-        for query, value in queryDict.items():
+        for query, value in query_dict.items():
             try:
                 cur.execute(f"UPDATE guilds SET '{str(query)}' = {value} WHERE id = {id};")
             except:

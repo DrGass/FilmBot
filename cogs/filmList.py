@@ -1,153 +1,93 @@
 import discord
 from discord.ext import commands
-import json
-import time
-import sys
-import asyncio
 from database import save, load
 
-sys.path.insert(0, "..\\Script")
 
-from sortFilms import main as sort
-
-
-class UpdateFilmListCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+class FilmListCog(commands.Cog):
+    def __init__(self, bot:commands.Bot):
         self.bot = bot
-        self.emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
         
-
-    # Just informing me login was succsessful 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(
-            f"We have logged in as {self.bot.user}"
-        )
-
-
-    # Most probably finished, but might need some polishing
     @commands.command()
-    async def film(self, ctx: commands.Context):
-        data = load(lastVoting,lastVotingMessage,role,channel)
+    async def padd(self, ctx: commands.Context):
+      
+        data = load([films,channel])
 
-        lastVoting = data[0]
-        lastVotingMessage = data[1]
-        role = data[2]
-        channel = data[3]
-        id = ctx.guild.id 
-
-        if ctx.message.channel.id != channel:
+        channel = data[1]
+        if ctx.channel.id != channel:
             return
 
-        filmDict, filmList = sort(id)
+        films = data[0]
 
-        if lastVoting:
-            pingMsg = (
-                f"<@&{role}>" if role is not None else "Moi drodzy,"
-            )
-            await ctx.channel.send(
-                f"{pingMsg} zapraszam do głosowania, w dzisiejszym menu mamy: \n{filmList}"
-            )
-            lastVoting = True
-            save({"lastVoting" : lastVoting})
 
+        id = ctx.guild.id 
+
+        filmToAdd = str(ctx.message.content[11:])
+        finalString = ""
+
+        for i in range(len(films)):
+            finalString += str(i) + ": " + films[i] + "\n"
+
+        # If no arguments were given
+        if len(filmToAdd) == 0:
+            await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
         else:
-            async for msg in ctx.channel.history(limit=50):
-                # print(msg.id, self.dataDict["lastVotingMessage"])
-                if str(msg.id) == lastVotingMessage:
-                    await msg.reply(
-                        f"Głosowanie już trwa -> <@{ctx.message.author.id}> <-"
-                    )
-
-                    await asyncio.sleep(3)
-                    await ctx.message.delete()
+            for film in films:
+                if filmToAdd.lower() in str(film).lower():
+                    await ctx.channel.send(f"Taki film już jest na liście")
                     return
+
+            films.append(filmToAdd)
+            finalString += str(len(films)) + ": " + filmToAdd + "\n"
+
+            await ctx.channel.send(
+                f"<@{ctx.message.author.id}>, dodano propozycję: {filmToAdd}, lista teraz prezentuje się tak: \n{finalString}"
+            )
+            save({"films":films})
 
         await ctx.message.delete()
 
-    # Rewrite adding, showing and removing propositions and add same solutions to film list (if someone won't be using app, then it'll be more accesible c: )
+    @commands.command()
+    async def p(self, ctx: commands.Context):
+        data = load([films,channel])
 
-    ### Moved to propositionList.py
+        channel = data[1]
+        if ctx.channel.id != channel:
+            return
+        
+        films = data[0]
+        
+        finalString = ""
 
-    # @commands.command()
-    # async def padd(self, ctx: commands.Context):
-    #     filmToAdd = str(ctx.message.content[11:])
-    #     finalString = ""
-    #     num = 1
+        for i in range(len(films)):
+            finalString += str(i) + ": " + str(films) + "\n"
 
-    #     for film in self.filmPropositions:
-    #         finalString += str(num) + ": " + film + "\n"
-    #         num += 1
+        await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
 
-    #     # If no arguments were given
-    #     if len(filmToAdd) == 0:
-    #         await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
-    #     else:
-    #         for film in self.filmPropositions:
-    #             if filmToAdd.lower() in str(film).lower():
-    #                 await ctx.channel.send(f"Taki film już jest na liście")
-    #                 return
+        await ctx.message.delete()
 
-    #         self.filmPropositions.append(filmToAdd)
-    #         finalString += str(num) + ": " + filmToAdd + "\n"
+    @commands.command()
+    async def pdel(self, ctx: commands.Context):
+        data = load([films,channel])
 
-    #         await ctx.channel.send(
-    #             f"<@{ctx.message.author.id}>, dodano propozycję: {filmToAdd}, lista teraz prezentuje się tak: \n{finalString}"
-    #         )
-    #         self.saveFilms()
-
-    #     await ctx.message.delete()
-
-    # @commands.command()
-    # async def p(self, ctx: commands.Context):
-    #     finalString = ""
-    #     num = 1
-    #     for film in self.filmPropositions:
-    #         finalString += str(num) + ": " + film + "\n"
-    #         num += 1
-
-    #     await ctx.channel.send(f"Aktualna lista propozycji:\n{finalString}")
-
-    #     await ctx.message.delete()
-
-    # @commands.command()
-    # async def pdel(self, ctx: commands.Context):
-    #     # take firt word in film name and convert it to str
-    #     filmToDel = str((ctx.message.content[11:].split())[0])
-
-    #     for film in self.filmPropositions:
-    #         if filmToDel.lower() in str(film).lower():
-    #             self.filmPropositions.remove(film)
-    #             await ctx.channel.send(
-    #                 f"<@{ctx.message.author.id}>, usunięto pozycję: {film}"
-    #             )
-    #             self.saveFilms()
-    #             break
-
-    #     await ctx.message.delete()
+        channel = data[1]
+        if ctx.channel.id != channel:
+            return
     
-    ### Moved to deleteListener.py
+        films = data[0]
+        
+        # take firt word in film name and convert it to str
+        filmToDel = str((ctx.message.content[11:].split())[0])
 
-    # @commands.Cog.listener()
-    # async def on_message(self, message: discord.Message):
-    #     if message.channel.id not in self.acceptedChannels:
-    #         return
+        for film in films:
+            if filmToDel.lower() in str(film).lower():
+                films.remove(film)
+                await ctx.channel.send(
+                    f"<@{ctx.message.author.id}>, usunięto pozycję: {film}"
+                )
+                save({"films":films})
+                break
 
-    #     # print(self.dataDict, message.author, self.bot.user)
-    #     if message.author == self.bot.user:
-    #         # Voting message adding reactions
-    #         if message.content.startswith("<@&"):
-    #             for i in range(0, len(self.filmDict)):
-    #                 await message.add_reaction(self.emojis[i])
+        await ctx.message.delete()
 
-    #             self.dataDict["lastVotingMessage"] = str(message.id)
-    #             self.saveData()
-
-    #         # Voting is running message
-    #         elif self.messagesToDel in message.content.lower():
-    #             await asyncio.sleep(5)
-    #             await message.delete()
-
-
-async def setup(bot):
-    await bot.add_cog(UpdateFilmListCog(bot))
+def setup(bot:commands.Bot):
+    bot.add_cog(FilmListCog(bot))

@@ -2,21 +2,21 @@ import discord
 from discord.ext import commands
 
 
-class CogName(commands.Cog):
+class SettingCog(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
 
-    @commands.command(name = "Choose role")
-    async def  commandName(self, ctx:commands.Context):
+    @commands.role(name = "Choose role")
+    async def  role(self, ctx:commands.Context):
         await ctx.send("template command")
 
-    @commands.command(name = "Choose channel")
-    async def  commandName(self, ctx:commands.Context):
+    @commands.channel(name = "Choose channel")
+    async def  channel(self, ctx:commands.Context):
         await ctx.send("template command")
 
-    @commands.command(name = "Choose role")
-    async def  commandName(self, ctx:commands.Context):
+    @commands.auto(name = "Auto Setting")
+    async def  auto(self, ctx:commands.Context):
         await ctx.send("template command")
 
 def setup(bot:commands.Bot):
-    bot.add_cog(CogName(bot))
+    bot.add_cog(SettingCog(bot))
