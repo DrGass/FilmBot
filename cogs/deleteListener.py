@@ -24,6 +24,6 @@ class DeleteListenerCog(commands.Cog):
             await asyncio.sleep(4)
             await message.delete()
 
-def setup(bot:commands.Bot):
-    bot.add_cog(DeleteListenerCog(bot))
+async def setup(bot:commands.Bot):
+    await bot.add_cog(DeleteListenerCog(bot))
 

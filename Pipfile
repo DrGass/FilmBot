@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 discord = "*"
-python-dotenv = "*"
 asyncio = "*"
 paramiko = "*"
 psycopg2 = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

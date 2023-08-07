@@ -3,7 +3,7 @@ from dbconfig import config
 from psycopg2.extras import Json
 
 
-def load(id, query_list):
+async def load(id, query_list):
     """Save all the data to database"""
     conn = None
     try:
@@ -18,18 +18,20 @@ def load(id, query_list):
         cur = conn.cursor()
         query = ""
         for item in query_list:
-            query += (str(item)).replace('_','') + ","
+            query += (str(item)) + ","
+
+        # print(query)
 
         # select_query = cur.execute(f'SELECT * FROM guilds WHERE id = {id};')
         cur.execute(f"SELECT {query[:-1]} FROM guilds WHERE id = {id};")
         data = cur.fetchall()
 
-        print(data, type(data))
-
         # close the communication with the PostgreSQL
         cur.close()
 
-        return data
+        # print(data, type(data))
+        
+        return (data[0])
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)

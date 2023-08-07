@@ -8,7 +8,7 @@ class FilmListCog(commands.Cog):
         self.bot = bot
         
     @commands.command()
-    async def padd(self, ctx: commands.Context):
+    async def fadd(self, ctx: commands.Context):
       
         data = load([films,channel])
 
@@ -47,7 +47,7 @@ class FilmListCog(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def p(self, ctx: commands.Context):
+    async def f(self, ctx: commands.Context):
         data = load([films,channel])
 
         channel = data[1]
@@ -66,7 +66,7 @@ class FilmListCog(commands.Cog):
         await ctx.message.delete()
 
     @commands.command()
-    async def pdel(self, ctx: commands.Context):
+    async def fdel(self, ctx: commands.Context):
         data = load([films,channel])
 
         channel = data[1]
@@ -89,5 +89,6 @@ class FilmListCog(commands.Cog):
 
         await ctx.message.delete()
 
-def setup(bot:commands.Bot):
-    bot.add_cog(FilmListCog(bot))
+async def setup(bot:commands.Bot):
+    await bot.add_cog(FilmListCog(bot))
+
